@@ -23,6 +23,7 @@ class NewsPuller():
         if (val > config.NEWS_DAILY_LIMIT):
             logging.exception('Exceeded News API daily request limit')
             raise RuntimeError('Exceeded the daily limit for news requests')
+        self._pulls = val
     
     def pullTickerNews(self, date):
         client = NewsApiClient(api_key=self._key)
@@ -34,8 +35,9 @@ class NewsPuller():
         # Create directory for the particular day
         full_path = '{}{}'.format(self._ticker_path, date.strftime('%m-%d-%Y'))
 
-        # Remove this line later        
-        os.rmdir(full_path)
+        # Remove this line later - for testing only 
+        if os.path.isdir(full_path):
+            os.rmdir(full_path)
 
         if os.path.isdir(full_path):
             logging.warning('%s data for %s exists already', TAG, date.strftime('%m-%d-%Y'))
@@ -43,23 +45,23 @@ class NewsPuller():
         os.mkdir(full_path)
 
 
-        logging.info('%s pulling information for tickers', TAG)
         start_of_day = date.replace(second=0, minute=0, hour=0)
         end_of_day = start_of_day + timedelta(days=1)
         for ticker in config.COMPANIES_OF_INTEREST.keys():
-            query = ticker if len(ticker) > 2 else config.COMPANIES_OF_INTEREST[ticker]
+            logging.info('%s pulling information for %s', TAG, ticker)
             all_for_ticker = client.get_everything(
-                q=query,
+                q=config.COMPANIES_OF_INTEREST[ticker],
                 from_param=start_of_day,
                 to=end_of_day,
                 language='en',
                 sort_by='relevancy',
                 page_size=100
-            ) 
-            print(all_for_ticker['articles'][0]['url'])
-            print(all_for_ticker['totalResults'])
-            print(len(all_for_ticker['articles']))
+            )
+            self.pulls += 1
+            print(all_for_ticker)
 
-if __name__ == '__main__':
-    logging.error('%s Attempt to invoke from CLI', TAG)
-    raise RuntimeError('%s invoked', TAG)
+            # TODO
+            if all_for_ticker['status'] == 'ok' and all_for_ticker['totalResults'] is not 0:
+                print('Article passed') 
+            else:
+                logging.warn('%s no data pulled for %s', TAG, ticker)

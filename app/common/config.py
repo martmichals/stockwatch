@@ -2,12 +2,12 @@
     Configuration file for the application, sets key parameters
     Variables denotes with (*) at the end of the corresponding comment must be set before running the program
 """
-import secrets
+from common import secrets
 import logging, os
 
 # REQUIRED
 DATA_PATH = '/home/martmichals/stockwatch/app/data/'       # Path for data folder *
-COMPANIES_OF_INTEREST = {'MSFT': 'Microsoft', 'V': 'Visa'} # Stock tickers of interest, no more than 450 *
+COMPANIES_OF_INTEREST = {'NOC': 'Norhtrop Grumman'} # Stock tickers of interest, no more than 450 *
 
 # Script info
 TAG = 'config.py -'
