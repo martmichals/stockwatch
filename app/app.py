@@ -17,7 +17,7 @@ config.configure(args.mode)
 
 # Get yesterday's date, ensure that an hour has passed from yesterday (News API delay)
 current_time = datetime.now(tz=pytz.timezone('US/Eastern'))
-yesterday = current_time - timedelta(days=1)
+yesterday = current_time - timedelta(days=1) - timedelta(hours=1) 
 if yesterday.hour < 1:
     logging.exception('%s Script ran too soon in the day', TAG)
     raise RuntimeError('Script was run too soon')
